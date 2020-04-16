@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <style>
+        table {
+            width: 250px;
+            table-layout: fixed;
+        }
+
+        table tr {
+            height: 1em;
+        }
+
+        td th {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+    </style>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>List all torrents</title>
+</head>
+<body>
+<div sec:authorize="hasAuthority('WRITE_PRIVILEGE')" class="container table">
+    <p>All torrent threads:</p>
+    <br>
+    <form method="POST" th:action="@{/auth/deleteTorrents}" class="form-select-button">
+        <table class="table table-bordered" style="border: 1px solid; overflow-wrap: break-word;">
+            <!-- iterate over the collection using forEach loop -->
+            <tr>
+                <th>Id</th>
+                <th>File name</th>
+                <th>Magnet link (Click to copy)</th>
+                <th>Status</th>
+                <th>Download link</th>
+                <th>Delete all files</th>
+                <th>Restart torrent</th>
+            </tr>
+            <tr th:each="torrent : ${torrents}">
+                <td><span th:text="${torrent.torrentThreadId}">Torrent Id </span></td>
+                <td><span th:text="${torrent.torrentName}">Torrent Name</span></td>
+                <td>
+                    <div id="a1" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                         onclick="copyDivToClipboard()" th:text="${torrent.magnetLink}">Click to copy
+                    </div>
+                </td>
+                <td><span th:text="${torrent.status}">Status</span></td>
+                <td>
+                    <div th:if="${torrent.status < 100.0 or torrent.zippingThread.isAlive()}">
+                        Wait please until downloading and zipping finished
+                    </div>
+
+                    <div th:unless="${torrent.status < 100.0 or torrent.zippingThread.isAlive()}">
+                        <a th:href="@{'/auth/downloadTorrentFromServer/' + ${torrent.torrentThreadId}}">
+                            Download file as zip
+                        </a>
+                    </div>
+                </td>
+                <td>
+                    <input type="checkbox" class="check-box-table-cell" th:name="idChecked"
+                           th:value="${torrent.torrentThreadId}"/>
+                </td>
+                <td>
+                    <div>
+                        <form method="POST" th:action="@{/auth/restartTorrent}" class="form-select-button">
+                            <button type="submit" th:name="restartId"
+                                    class="btn btn-primary"
+                                    th:value="${torrent.torrentThreadId}">
+                                Restart torrent
+                            </button>
+                        </form>
+                    </div>
+                    <br>
+                    <div>
+                        <form method="POST" th:action="@{/auth/restartZipping}" class="form-select-button">
+                            <button type="submit" th:name="restartId"
+                                    class="btn btn-primary"
+                                    th:value="${torrent.torrentThreadId}">
+                                Restart zipping
+                            </button>
+                        </form>
+                    </div>
+                </td>
+        </table>
+        <button type="submit" name='delete' value="delete" class='btn btn-primary'>Delete</button>
+    </form>
+    <span th:if="${errors != null and !errors.isEmpty()}">Torrents not found with next ids:</span>
+    <br>
+    <span th:each="error : ${errors}">
+        <p th:text="${error}"> </p><br>
+    </span>
+</div>
+
+<br>
+
+<div class="container table">
+    <p>All torrent threads for <span sec:authentication="name"></span></p>
+    <br>
+    <form method="POST" th:action="@{/auth/deleteTorrents}" class="form-select-button">
+        <table class="table table-bordered" style="border: 1px solid; overflow-wrap: break-word;">
+            <!-- iterate over the collection using forEach loop -->
+            <tr>
+                <th>Id</th>
+                <th>File name</th>
+                <th>Magnet link (Click to copy)</th>
+                <th>Status</th>
+                <th>Download link</th>
+                <th>Delete all files</th>
+                <th>Restart torrent</th>
+            </tr>
+
+            <tr th:each="user_torrent : ${user_torrents}">
+                <td><span th:text="${user_torrent.torrentThreadId}">Torrent Id </span></td>
+                <td><span th:text="${user_torrent.torrentName}">Torrent Name</span></td>
+                <td>
+                    <div id="a" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                         onclick="copyDivToClipboard()" th:text="${user_torrent.magnetLink}">Click to copy
+                    </div>
+                </td>
+                <td><span th:text="${user_torrent.status}">Status</span></td>
+                <td>
+                    <div th:if="${user_torrent.status < 100.0 or user_torrent.zippingThread.isAlive()}">
+                        Wait please until downloading and zipping finished
+                    </div>
+
+                    <div th:unless="${user_torrent.status < 100.0 or user_torrent.zippingThread.isAlive()}">
+                        <a th:href="@{'/auth/downloadTorrentFromServer/' + ${user_torrent.torrentThreadId}}">
+                            Download file as zip
+                        </a>
+                    </div>
+                </td>
+                <td>
+                    <input type="checkbox" class="check-box-table-cell" th:name="idChecked"
+                           th:value="${user_torrent.torrentThreadId}"/>
+                </td>
+                <td>
+                    <div>
+
+                        <form method="POST" th:action="@{/auth/restartTorrent}" class="form-select-button">
+                            <button type="submit" th:name="restartId"
+                                    class="btn btn-primary"
+                                    th:value="${user_torrent.torrentThreadId}">
+                                Restart torrent
+                            </button>
+                        </form>
+                    </div>
+                    <br>
+                    <div>
+                        <form method="POST" th:action="@{/auth/restartZipping}" class="form-select-button">
+                            <button type="submit" th:name="restartId"
+                                    class="btn btn-primary"
+                                    th:value="${user_torrent.torrentThreadId}">
+                                Restart zipping
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <button type="submit" name='delete' value="delete" class='btn btn-primary'>Delete</button>
+    </form>
+    <span th:if="${errors != null and !errors.isEmpty()}">Torrents not found with next ids:</span>
+    <br>
+    <span th:each="error : ${errors}">
+        <p th:text="${error}"> </p><br>
+    </span>
+</div>
+
+
+<br>
+<script>
+    function copyToClipboard(id) {
+        var from = document.getElementById(id);
+        var range = document.createRange();
+        window.getSelection().removeAllRanges();
+        range.selectNode(from);
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+    }
+</script>
+<script>
+    function copyDivToClipboard() {
+        var range = document.getSelection().getRangeAt(0);
+        range.selectNode(document.getElementById("a"));
+        window.getSelection().addRange(range);
+        document.execCommand("copy")
+    }
+
+    function copyDivToClipboard() {
+        var range = document.getSelection().getRangeAt(0);
+        range.selectNode(document.getElementById("a1"));
+        window.getSelection().addRange(range);
+        document.execCommand("copy")
+    }
+
+</script>
+<a th:href="@{/home}">Get home</a>
+<br>
+<a th:href="@{/auth/downloadTorrent/inputMagnetLink}">Upload torrent</a>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+</html>

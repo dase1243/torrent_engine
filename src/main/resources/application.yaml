@@ -1,0 +1,49 @@
+error:
+  whitelabel:
+    enabled: false
+server:
+  port: 8080
+  error:
+    include-stacktrace: always
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+#      ddl-auto: none
+    show-sql: true
+  messages:
+    basename: validation
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      #      suffix: .jsp
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+      file-size-threshold: 2KB
+      enabled: true
+  security:
+    filter:
+      dispatcher-types: ASYNC, FORWARD, INCLUDE, REQUEST, ERROR
+  datasource:
+    name: torrent_engine_db
+    #    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: admin
+    password: admin
+    url: jdbc:h2:file:~/torrent_engine_db;DB_CLOSE_ON_EXIT=FALSE;DB_CLOSE_DELAY=-1;
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    org:
+      springframework:
+        web: debug
+  file: myapplication.log
+#  path: D:\PrFiles\IdeaProjects\torrent_engine\
+  config: classpath:logback-spring.xml
+  path: /home/root/

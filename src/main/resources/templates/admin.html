@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Admin page</title>
+</head>
+<body>
+<p>Hello <span sec:authentication="name"></span></p>
+<br>
+<br>
+<a>List all users with all information about each</a>
+<div class="container table">
+    <p>All torrent threads:</p>
+    <br>
+    <form method="POST" th:action="@{/admin/deleteUsers}" class="form-select-button">
+        <table class="table table-bordered" style="border: 1px solid;">
+            <!-- iterate over the collection using forEach loop -->
+            <tr>
+                <th>Id</th>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Last name</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Torrents</th>
+                <th>Delete check box</th>
+            </tr>
+            <tr th:each="user : ${users}">
+                <td><span th:text="${user.id}">Torrent Id </span></td>
+                <td><span th:text="${user.username}">Username</span></td>
+                <td><span th:text="${user.name}">Name</span></td>
+                <td><span th:text="${user.lastName}">Last name</span></td>
+                <td><span th:text="${user.email}">Email</span></td>
+                <!--<td>-->
+                <!--<span th:each="role : ${user.roles}">-->
+                <!--<span th:text="${role}">Role</span> <br>-->
+                <!--</span>-->
+                <!--</td>-->
+                <!--<td>-->
+                <!--<span th:each="torrent : ${user.torrents}">-->
+                <!--<span th:text="${torrent.torrentThreadId}">Torrent</span> <br>-->
+                <!--</span>-->
+                <!--</td>-->
+                <td>
+                    <input type="checkbox" class="check-box-table-cell" th:name="idChecked" th:value="${user.id}"/>
+                </td>
+            </tr>
+        </table>
+        <button type="submit" name='delete' value="delete" class='btn btn-primary'>Delete</button>
+    </form>
+</div>
+<br>
+<a th:href="@{/auth/listAllTorrentThreads}">List all torrents</a>
+<br>
+<a th:href="@{/home}">Get home</a>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+</html>
